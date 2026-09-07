@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OnCloud33 Ganesh Utsav 2026 — Donation Portal</title>
+<style>
+  :root{
+    --maroon:#6b0f1a;
+    --maroon-dark:#4a0a12;
+    --gold:#d4a017;
+    --gold-light:#f3d98b;
+    --cream:#fdf6e3;
+    --green:#1c5d34;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Tahoma, Verdana, sans-serif;
+    background:var(--cream);
+    color:#332211;
+  }
+  header.banner{
+    background:linear-gradient(135deg,var(--maroon),var(--maroon-dark));
+    color:var(--gold-light);
+    text-align:center;
+    padding:22px 12px 14px;
+    border-bottom:6px solid var(--gold);
+  }
+  header.banner h1{
+    margin:0;
+    font-size:1.8rem;
+    letter-spacing:1px;
+  }
+  header.banner p{
+    margin:6px 0 0;
+    font-size:1rem;
+    color:var(--gold-light);
+  }
+  .schedule-wrap{
+    max-width:1100px;
+    margin:18px auto;
+    padding:0 14px;
+    text-align:center;
+  }
+  .schedule-wrap img{
+    max-width:100%;
+    border:4px solid var(--gold);
+    border-radius:10px;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);
+  }
+  .schedule-wrap .caption{
+    font-size:.85rem;
+    color:#664;
+    margin-top:6px;
+    font-style:italic;
+  }
+  .tabs{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:18px 0;
+  }
+  .tabs button{
+    padding:10px 26px;
+    border:2px solid var(--maroon);
+    background:var(--cream);
+    color:var(--maroon);
+    font-weight:600;
+    border-radius:30px;
+    cursor:pointer;
+    font-size:.95rem;
+    transition:.2s;
+  }
+  .tabs button.active{
+    background:var(--maroon);
+    color:var(--gold-light);
+  }
+  main{
+    max-width:820px;
+    margin:0 auto 60px;
+    padding:0 16px;
+  }
+  .card{
+    background:#fffdf7;
+    border:1px solid var(--gold);
+    border-radius:14px;
+    padding:26px 28px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+    margin-bottom:24px;
+  }
+  .card h2{
+    color:var(--maroon);
+    border-bottom:2px solid var(--gold-light);
+    padding-bottom:8px;
+    margin-top:0;
+  }
+  label{
+    display:block;
+    margin:14px 0 6px;
+    font-weight:600;
+    color:var(--maroon-dark);
+    font-size:.92rem;
+  }
+  input[type=text], input[type=tel], input[type=number], input[type=file], select, textarea{
+    width:100%;
+    padding:10px 12px;
+    border:1.5px solid #d8c79a;
+    border-radius:8px;
+    font-size:.95rem;
+    background:#fffefb;
+  }
+  input:focus, select:focus{
+    outline:2px solid var(--gold);
+  }
+  .hint{
+    font-size:.78rem;
+    color:#886;
+    margin-top:2px;
+  }
+  fieldset{
+    border:1.5px dashed var(--gold);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-top:16px;
+  }
+  .tnc-box{
+    background:#fff8e6;
+    border:1.5px solid var(--gold);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-top:10px;
+    font-size:.85rem;
+    color:#553;
+  }
+  .tnc-box h3{
+    margin:0 0 8px;
+    color:var(--maroon);
+    font-size:.95rem;
+  }
+  .tnc-box ol{
+    margin:0;
+    padding-left:20px;
+  }
+  .tnc-box li{margin-bottom:4px;}
+  .screenshot-preview{
+    margin-top:8px;
+    max-width:160px;
+    max-height:160px;
+    display:none;
+    border:2px solid var(--gold);
+    border-radius:6px;
+  }
+  .drop-zone{
+    border:2px dashed var(--gold);
+    border-radius:10px;
+    padding:22px 14px;
+    text-align:center;
+    background:#fffaf0;
+    cursor:pointer;
+    font-size:.88rem;
+    color:#775;
+    transition:.2s;
+  }
+  .drop-zone:hover{
+    background:#fff3d6;
+    border-color:var(--maroon);
+  }
+  .drop-zone.dragover{
+    background:var(--gold-light);
+    border-color:var(--maroon);
+    color:var(--maroon-dark);
+  }
+  legend{
+    font-weight:700;
+    color:var(--maroon);
+    padding:0 8px;
+  }
+  .grocery-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid #eee0b8;
+  }
+  .grocery-item:last-child{border-bottom:none;}
+  .grocery-item span{font-weight:600;}
+  .grocery-item input[type=number]{width:90px;}
+  .radio-row{
+    display:flex;
+    gap:24px;
+    margin-top:8px;
+  }
+  .radio-row label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-weight:500;
+    margin:0;
+  }
+  .qr-box{
+    text-align:center;
+    margin-top:18px;
+    padding:16px;
+    background:var(--gold-light);
+    border-radius:10px;
+  }
+  .qr-box img{
+    max-width:180px;
+    border:3px solid var(--maroon);
+    border-radius:8px;
+    background:#fff;
+    padding:4px;
+  }
+  .qr-box p{
+    margin:8px 0 0;
+    font-weight:600;
+    color:var(--maroon-dark);
+    font-size:.88rem;
+  }
+  button.submit-btn, button.action-btn{
+    background:var(--green);
+    color:#fff;
+    border:none;
+    padding:12px 20px;
+    font-size:1rem;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:20px;
+    font-weight:700;
+  }
+  button.submit-btn:hover, button.action-btn:hover{opacity:.9;}
+  .hidden{display:none !important;}
+  #toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--green);
+    color:#fff;
+    padding:12px 22px;
+    border-radius:8px;
+    box-shadow:0 3px 10px rgba(0,0,0,.3);
+    opacity:0;
+    transition:opacity .4s;
+    z-index:999;
+  }
+  #toast.show{opacity:1;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.85rem;
+    margin-top:10px;
+  }
+  th,td{
+    border:1px solid #d8c79a;
+    padding:6px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{
+    background:var(--maroon);
+    color:var(--gold-light);
+  }
+  tr:nth-child(even){background:#fbf3d9;}
+  .stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  .stat-box{
+    background:var(--maroon);
+    color:var(--gold-light);
+    padding:12px 18px;
+    border-radius:10px;
+    min-width:150px;
+    text-align:center;
+  }
+  .stat-box .num{font-size:1.4rem;font-weight:700;}
+  .stat-box .lbl{font-size:.78rem;}
+  .toolbar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .toolbar select, .toolbar input{
+    padding:8px;
+    border-radius:6px;
+    border:1px solid #d8c79a;
+  }
+  .login-box{
+    max-width:340px;
+    margin:0 auto;
+    text-align:center;
+  }
+  footer{
+    text-align:center;
+    padding:20px;
+    background:var(--maroon-dark);
+    color:var(--gold-light);
+    font-size:.82rem;
+  }
+  footer .contacts{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-top:8px;
+  }
+  .required::after{
+    content:" *";
+    color:#b00;
+  }
+</style>
+</head>
+<body>
+
+<header class="banner">
+  <h1>🕉️ OnCloud33 Ganesh Utsav 2026 🕉️</h1>
+  <p>14<sup>th</sup> – 25<sup>th</sup> September 2026 &nbsp;|&nbsp; Donation & Contribution Portal</p>
+</header>
+
+<div class="schedule-wrap">
+  <img id="scheduleImg" src="assets/schedule.jpg" alt="Pooja & Celebration Schedule"
+       onerror="this.onerror=null;this.src='';this.alt='Schedule image not found — place schedule.jpg inside the assets folder next to this HTML file.';this.style.padding='40px';this.style.background='#eee';">
+  <div class="caption">Pooja & Celebration Schedule — for reference. (Place the poster image as <code>assets/schedule.jpg</code>)</div>
+</div>
+
+<div class="tabs">
+  <button id="tabDonateBtn" class="active" onclick="showTab('donate')">🙏 Donor Form</button>
+  <button id="tabAdminBtn" onclick="showTab('admin')">🔐 Admin View</button>
+</div>
+
+<main>
+
+  <!-- ===================== DONOR FORM ===================== -->
+  <section id="donateTab">
+    <div class="card">
+      <h2>Contribute for Ganesh Utsav 2026</h2>
+      <form id="donationForm">
+        <label class="required">Donor Name</label>
+        <input type="text" id="donorName" required placeholder="Full name">
+
+        <label class="required">Tower</label>
+        <select id="tower" required>
+          <option value="" disabled selected>-- Select Tower --</option>
+          <option value="T1">T1</option>
+          <option value="T2">T2</option>
+          <option value="T3">T3</option>
+          <option value="T4">T4</option>
+          <option value="T5">T5</option>
+        </select>
+
+        <label class="required">Flat</label>
+        <input type="text" id="flatNo" required placeholder="e.g. 204">
+
+        <label>Gothram</label>
+        <input type="text" id="gothram" placeholder="e.g. Bharadwaja">
+
+        <label class="required">Phone Number</label>
+        <input type="tel" id="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+
+        <label class="required">Donation Category</label>
+        <select id="category" required onchange="onCategoryChange()">
+          <option value="" disabled selected>-- Select a category --</option>
+          <option value="Vastralu">Ganesh Swamy Vastralu (వినాయకుడి విగ్రహానికి అలంకరించే ప్రత్యేకమైన బట్టలు/వస్త్రాలు)</option>
+          <option value="Garlands">Daily Flower Garlands & Decorations</option>
+          <option value="PoojaItems">Daily Pooja Items</option>
+          <option value="Prasadam">Daily Prasadam</option>
+          <option value="MahaPrasadam">Maha Prasadam (Anna Danam)</option>
+        </select>
+
+        <!-- Maha Prasadam sub-options -->
+        <fieldset id="mahaPrasadamBlock" class="hidden">
+          <legend>Maha Prasadam (Anna Danam) — Choose Contribution Type</legend>
+          <div class="radio-row">
+            <label><input type="radio" name="mahaType" value="Cash" onchange="onMahaTypeChange()"> Cash</label>
+            <label><input type="radio" name="mahaType" value="Grocery" onchange="onMahaTypeChange()"> Grocery Item</label>
+          </div>
+
+          <div id="groceryBlock" class="hidden">
+            <p class="hint">Select item(s) and quantity you'd like to donate. Donation amount will be auto-calculated below.</p>
+            <div class="grocery-item"><span>Rice Bag (26 Kg) — ₹1800/bag</span><input type="number" min="0" id="g_rice" value="0" oninput="recalcGroceryTotal()"></div>
+            <div class="grocery-item"><span>LPG Cylinder — ₹990/cylinder</span><input type="number" min="0" id="g_lpg" value="0" oninput="recalcGroceryTotal()"></div>
+            <div class="grocery-item"><span>Oil Packets — ₹160/packet</span><input type="number" min="0" id="g_oil" value="0" oninput="recalcGroceryTotal()"></div>
+            <div class="grocery-item"><span>Vegetables (Kg) — ₹60/kg</span><input type="number" min="0" id="g_veg" value="0" oninput="recalcGroceryTotal()"></div>
+            <div class="grocery-item"><span>Dal / Cereals (Kg) — ₹180/kg</span><input type="number" min="0" id="g_dal" value="0" oninput="recalcGroceryTotal()"></div>
+            <p id="groceryNote" class="hint hidden" style="color:var(--maroon-dark);font-weight:600;margin-top:10px;">Note: Respective POC will be reaching out to you on the same.</p>
+          </div>
+        </fieldset>
+
+        <!-- Amount + QR shown after any category selection -->
+        <div id="amountQrBlock" class="hidden">
+          <label id="amountLabel">Donation Amount (₹)</label>
+          <input type="number" id="amount" min="0" placeholder="Enter amount you wish to contribute" oninput="onAmountChange()">
+
+          <div id="screenshotBlock" class="hidden">
+            <label class="required">Payment Screenshot (mandatory for cash donation)</label>
+            <div id="dropZone" class="drop-zone" onclick="document.getElementById('paymentScreenshot').click();">
+              <span id="dropZoneText">📎 Click to browse, or drag &amp; drop your payment screenshot here</span>
+            </div>
+            <input type="file" id="paymentScreenshot" accept="image/*" onchange="previewScreenshot()" style="display:none;">
+            <img id="screenshotPreview" class="screenshot-preview" alt="Payment screenshot preview">
+          </div>
+
+          <div class="qr-box">
+            <img id="qrImg" src="assets/qr.png" alt="Scan & Contribute QR"
+                 onerror="this.onerror=null;this.alt='QR image not found — place qr.png inside the assets folder next to this HTML file.';this.style.padding='20px';this.style.background='#eee';">
+            <p>Scan & Contribute — Every Contribution, Every Blessing, Every Moment Together.</p>
+            <p style="font-size:.8rem;color:#553;margin-top:4px;">UPI ID: 8884501914@icici (Pradeep Kumar Associates)</p>
+          </div>
+        </div>
+
+        <div class="tnc-box">
+          <h3>Terms & Conditions</h3>
+          <ol>
+            <li>Donor's name (₹5000+ contribution) will be announced/displayed during the celebrations.</li>
+            <li>One item can be contributed by multiple donors.</li>
+            <li>Sponsored items will not be returned back to individuals post celebrations.</li>
+            <li>Any excessive amount received than the items purchased will be utilised in overall expenditure.</li>
+          </ol>
+        </div>
+
+        <label>Notes (optional)</label>
+        <textarea id="notes" rows="2" placeholder="Any preferred date to bring the item, or other remarks"></textarea>
+
+        <button type="submit" class="submit-btn">✅ Submit Contribution</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN VIEW ===================== -->
+  <section id="adminTab" class="hidden">
+    <div class="card">
+      <div id="adminLoginBlock" class="login-box">
+        <h2>Admin Login</h2>
+        <label>Admin Passcode</label>
+        <input type="text" id="adminPass" placeholder="Enter passcode">
+        <button class="action-btn" onclick="checkAdminLogin()">Unlock</button>
+        <p class="hint">Enter the admin passcode to access submissions.</p>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <h2>Donation Submissions</h2>
+        <div class="stats" id="statsRow"></div>
+
+        <div class="toolbar">
+          <select id="filterCategory" onchange="renderAdminTable()">
+            <option value="">All Categories</option>
+            <option value="Vastralu">Ganesh Swamy Vastralu</option>
+            <option value="Garlands">Daily Flower Garlands & Decorations</option>
+            <option value="PoojaItems">Daily Pooja Items</option>
+            <option value="Prasadam">Daily Prasadam</option>
+            <option value="MahaPrasadam">Maha Prasadam (Anna Danam)</option>
+          </select>
+          <input type="text" id="searchBox" placeholder="Search name / flat / phone" oninput="renderAdminTable()">
+          <button class="action-btn" onclick="exportCSV()">⬇ Export CSV</button>
+          <button class="action-btn" style="background:#5a4fcf" onclick="loadSampleData()">🧪 Load Sample Data</button>
+          <button class="action-btn" style="background:#b00020" onclick="clearAllData()">🗑 Clear All Data</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Timestamp</th><th>Name</th><th>Tower</th><th>Flat</th><th>Gothram</th><th>Phone</th>
+                <th>Category</th><th>Details</th><th>Amount (₹)</th><th>Screenshot</th><th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast"></div>
+
+<footer>
+  <div>Ganapathi Bappa Morya! 🙏 Let's celebrate together with devotion, joy & unity!</div>
+</footer>
+
+<script>
+  const STORAGE_KEY = 'oncloud33_ganesh_donations';
+  const CHECK_PASSCODE = 'Ganesh2026'; // <-- change this to your own admin passcode
+
+  const GROCERY_RATES = {
+    g_rice: { label: 'Rice Bag (26 Kg)', rate: 1800 },
+    g_lpg: { label: 'LPG Cylinder', rate: 990 },
+    g_oil: { label: 'Oil Packets', rate: 160 },
+    g_veg: { label: 'Vegetables (Kg)', rate: 60 },
+    g_dal: { label: 'Dal/Cereals (Kg)', rate: 180 }
+  };
+
+  const CATEGORY_LABELS = {
+    Vastralu: 'Ganesh Swamy Vastralu',
+    Garlands: 'Daily Flower Garlands & Decorations',
+    PoojaItems: 'Daily Pooja Items',
+    Prasadam: 'Daily Prasadam',
+    MahaPrasadam: 'Maha Prasadam (Anna Danam)'
+  };
+
+  function showTab(tab){
+    document.getElementById('donateTab').classList.toggle('hidden', tab!=='donate');
+    document.getElementById('adminTab').classList.toggle('hidden', tab!=='admin');
+    document.getElementById('tabDonateBtn').classList.toggle('active', tab==='donate');
+    document.getElementById('tabAdminBtn').classList.toggle('active', tab==='admin');
+    if(tab==='admin' && !document.getElementById('adminPanel').classList.contains('hidden')){
+      renderAdminTable();
+    }
+  }
+
+  function onCategoryChange(){
+    const cat = document.getElementById('category').value;
+    document.getElementById('mahaPrasadamBlock').classList.toggle('hidden', cat!=='MahaPrasadam');
+    document.getElementById('groceryBlock').classList.add('hidden');
+    document.querySelectorAll('input[name=mahaType]').forEach(r=>r.checked=false);
+    document.getElementById('amountQrBlock').classList.toggle('hidden', !cat);
+    const label = document.getElementById('amountLabel');
+    label.textContent = cat==='MahaPrasadam' ? 'Donation Amount (₹) — if opting Cash' : 'Donation Amount (₹)';
+  }
+
+  function onMahaTypeChange(){
+    const type = document.querySelector('input[name=mahaType]:checked')?.value;
+    document.getElementById('groceryBlock').classList.toggle('hidden', type!=='Grocery');
+    document.getElementById('groceryNote').classList.add('hidden');
+    if(type === 'Grocery'){
+      recalcGroceryTotal();
+    } else {
+      document.getElementById('amount').value = '';
+      document.getElementById('amount').readOnly = false;
+      onAmountChange();
+    }
+  }
+
+  function recalcGroceryTotal(){
+    let total = 0;
+    let anySelected = false;
+    Object.keys(GROCERY_RATES).forEach(id=>{
+      const qty = parseFloat(document.getElementById(id).value)||0;
+      if(qty>0){ anySelected = true; total += qty * GROCERY_RATES[id].rate; }
+    });
+    const amountInput = document.getElementById('amount');
+    amountInput.value = total;
+    amountInput.readOnly = true;
+    document.getElementById('groceryNote').classList.toggle('hidden', !anySelected);
+    onAmountChange();
+  }
+
+  function isCashDonation(){
+    const cat = document.getElementById('category').value;
+    if(cat === 'MahaPrasadam'){
+      const type = document.querySelector('input[name=mahaType]:checked')?.value;
+      return type === 'Cash';
+    }
+    return true; // all other categories: any amount entered is a cash contribution
+  }
+
+  function onAmountChange(){
+    const amt = parseFloat(document.getElementById('amount').value)||0;
+    const screenshotBlock = document.getElementById('screenshotBlock');
+    const needsScreenshot = amt>0 && isCashDonation();
+    screenshotBlock.classList.toggle('hidden', !needsScreenshot);
+    document.getElementById('paymentScreenshot').required = needsScreenshot;
+  }
+
+  function previewScreenshot(){
+    const file = document.getElementById('paymentScreenshot').files[0];
+    const preview = document.getElementById('screenshotPreview');
+    const dropZoneText = document.getElementById('dropZoneText');
+    if(file){
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+      if(dropZoneText) dropZoneText.textContent = '✅ Selected: ' + file.name + ' (click to change)';
+    } else {
+      preview.style.display = 'none';
+      if(dropZoneText) dropZoneText.textContent = '📎 Click to browse, or drag & drop your payment screenshot here';
+    }
+  }
+
+  (function setupDropZone(){
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('paymentScreenshot');
+    if(!dropZone || !fileInput) return;
+
+    ['dragenter','dragover'].forEach(evt=>{
+      dropZone.addEventListener(evt, e=>{
+        e.preventDefault(); e.stopPropagation();
+        dropZone.classList.add('dragover');
+      });
+    });
+    ['dragleave','drop'].forEach(evt=>{
+      dropZone.addEventListener(evt, e=>{
+        e.preventDefault(); e.stopPropagation();
+        dropZone.classList.remove('dragover');
+      });
+    });
+    dropZone.addEventListener('drop', e=>{
+      const files = e.dataTransfer.files;
+      if(files && files.length>0 && files[0].type.startsWith('image/')){
+        fileInput.files = files;
+        previewScreenshot();
+      } else {
+        alert('Please drop a valid image file.');
+      }
+    });
+  })();
+
+  function loadData(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveData(data){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  document.getElementById('donationForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const cat = document.getElementById('category').value;
+    const amt = parseFloat(document.getElementById('amount').value)||0;
+    const screenshotFile = document.getElementById('paymentScreenshot').files[0];
+    const cashDonation = isCashDonation();
+
+    if(amt > 0 && cashDonation && !screenshotFile){
+      alert('Please upload a payment screenshot as proof for your cash contribution.');
+      return;
+    }
+
+    let details = '';
+    let autoNote = '';
+    if(cat === 'MahaPrasadam'){
+      const type = document.querySelector('input[name=mahaType]:checked')?.value;
+      if(!type){ alert('Please choose Cash or Grocery Item for Maha Prasadam.'); return; }
+      if(type === 'Grocery'){
+        const items = [];
+        Object.keys(GROCERY_RATES).forEach(id=>{
+          const val = parseFloat(document.getElementById(id).value)||0;
+          if(val>0) items.push(GROCERY_RATES[id].label+': '+val);
+        });
+        if(items.length===0){ alert('Please select a quantity for at least one grocery item — quantity cannot be left at 0 for all items.'); return; }
+        details = 'Grocery — ' + items.join(', ') + ' (Total ₹'+amt+')';
+        autoNote = 'Respective POC will be reaching out to you on the same.';
+      } else {
+        details = 'Cash Contribution';
+      }
+    }
+
+    function finalizeSubmit(screenshotDataUrl){
+      const userNotes = document.getElementById('notes').value.trim();
+      const combinedNotes = [userNotes, autoNote].filter(Boolean).join(' | ');
+      const entry = {
+        id: Date.now(),
+        timestamp: new Date().toLocaleString(),
+        name: document.getElementById('donorName').value.trim(),
+        tower: document.getElementById('tower').value,
+        flat: document.getElementById('flatNo').value.trim(),
+        gothram: document.getElementById('gothram').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        category: cat,
+        categoryLabel: CATEGORY_LABELS[cat] || cat,
+        details: details,
+        amount: amt,
+        screenshot: screenshotDataUrl || '',
+        notes: combinedNotes
+      };
+
+      const data = loadData();
+      data.push(entry);
+      saveData(data);
+
+      showToast('🙏 Thank you ' + entry.name + '! Your contribution has been recorded.');
+      document.getElementById('donationForm').reset();
+      document.getElementById('mahaPrasadamBlock').classList.add('hidden');
+      document.getElementById('groceryBlock').classList.add('hidden');
+      document.getElementById('groceryNote').classList.add('hidden');
+      document.getElementById('amountQrBlock').classList.add('hidden');
+      document.getElementById('amount').readOnly = false;
+      document.getElementById('screenshotPreview').style.display = 'none';
+    }
+
+    if(screenshotFile){
+      const reader = new FileReader();
+      reader.onload = e => finalizeSubmit(e.target.result);
+      reader.readAsDataURL(screenshotFile);
+    } else {
+      finalizeSubmit(null);
+    }
+  });
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 3500);
+  }
+
+  function checkAdminLogin(){
+    const val = document.getElementById('adminPass').value;
+    if(val === CHECK_PASSCODE){
+      document.getElementById('adminLoginBlock').classList.add('hidden');
+      document.getElementById('adminPanel').classList.remove('hidden');
+      renderAdminTable();
+    } else {
+      alert('Incorrect passcode.');
+    }
+  }
+
+  function renderAdminTable(){
+    const data = loadData();
+    const catFilter = document.getElementById('filterCategory').value;
+    const search = document.getElementById('searchBox').value.toLowerCase();
+
+    const filtered = data.filter(d=>{
+      if(catFilter && d.category !== catFilter) return false;
+      if(search){
+        const hay = (d.name+' '+d.tower+' '+d.flat+' '+d.gothram+' '+d.phone).toLowerCase();
+        if(!hay.includes(search)) return false;
+      }
+      return true;
+    });
+
+    // stats
+    const totalAmount = data.reduce((s,d)=>s+(d.amount||0),0);
+    const byCat = {};
+    data.forEach(d=>{ byCat[d.categoryLabel] = (byCat[d.categoryLabel]||0)+1; });
+    let statsHtml = `
+      <div class="stat-box"><div class="num">${data.length}</div><div class="lbl">Total Submissions</div></div>
+      <div class="stat-box"><div class="num">₹${totalAmount.toLocaleString()}</div><div class="lbl">Total Cash Pledged</div></div>`;
+    Object.keys(byCat).forEach(k=>{
+      statsHtml += `<div class="stat-box"><div class="num">${byCat[k]}</div><div class="lbl">${k}</div></div>`;
+    });
+    document.getElementById('statsRow').innerHTML = statsHtml;
+
+    const tbody = document.getElementById('adminTableBody');
+    tbody.innerHTML = '';
+    filtered.slice().reverse().forEach((d,i)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${filtered.length-i}</td>
+        <td>${d.timestamp}</td>
+        <td>${escapeHtml(d.name)}</td>
+        <td>${escapeHtml(d.tower||'-')}</td>
+        <td>${escapeHtml(d.flat)}</td>
+        <td>${escapeHtml(d.gothram||'-')}</td>
+        <td>${escapeHtml(d.phone)}</td>
+        <td>${escapeHtml(d.categoryLabel)}</td>
+        <td>${escapeHtml(d.details||'-')}</td>
+        <td>${d.amount||0}</td>
+        <td>${d.screenshot ? `<img src="${d.screenshot}" style="max-width:60px;max-height:60px;border-radius:4px;cursor:pointer" onclick="window.open('${d.screenshot}','_blank')">` : '-'}</td>
+        <td>${escapeHtml(d.notes||'-')}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function escapeHtml(str){
+    if(str===undefined||str===null) return '';
+    return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+  }
+
+  function exportCSV(){
+    const data = loadData();
+    if(data.length===0){ alert('No data to export.'); return; }
+    const headers = ['Timestamp','Name','Tower','Flat','Gothram','Phone','Category','Details','Amount','Screenshot Attached','Notes'];
+    const rows = data.map(d=>[d.timestamp,d.name,d.tower,d.flat,d.gothram,d.phone,d.categoryLabel,d.details,d.amount,(d.screenshot?'Yes':'No'),d.notes]);
+    let csv = headers.join(',') + '\n' + rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'oncloud33_ganesh_donations.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function clearAllData(){
+    if(confirm('Are you sure you want to delete ALL submitted records? This cannot be undone.')){
+      localStorage.removeItem(STORAGE_KEY);
+      renderAdminTable();
+    }
+  }
+
+  function loadSampleData(){
+    if(!confirm('This will add 4 sample donation entries for testing the Admin view. Continue?')) return;
+
+    const tinyImg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+
+    const samples = [
+      {
+        id: Date.now()+1,
+        timestamp: new Date().toLocaleString(),
+        name: 'Ramesh Kumar',
+        tower: 'T2',
+        flat: '304',
+        gothram: 'Bharadwaja',
+        phone: '9876543210',
+        category: 'Vastralu',
+        categoryLabel: CATEGORY_LABELS['Vastralu'],
+        details: '',
+        amount: 2000,
+        screenshot: tinyImg,
+        notes: 'Will drop off vastralu on 13th evening'
+      },
+      {
+        id: Date.now()+2,
+        timestamp: new Date().toLocaleString(),
+        name: 'Lakshmi Priya',
+        tower: 'T4',
+        flat: '112',
+        gothram: 'Kashyapa',
+        phone: '9812345678',
+        category: 'Garlands',
+        categoryLabel: CATEGORY_LABELS['Garlands'],
+        details: '',
+        amount: 1500,
+        screenshot: tinyImg,
+        notes: ''
+      },
+      {
+        id: Date.now()+3,
+        timestamp: new Date().toLocaleString(),
+        name: 'Suresh Reddy',
+        tower: 'T1',
+        flat: '208',
+        gothram: '',
+        phone: '9900112233',
+        category: 'MahaPrasadam',
+        categoryLabel: CATEGORY_LABELS['MahaPrasadam'],
+        details: 'Grocery — Rice Bag (26 Kg): 2, Oil Packets: 5 (Total ₹4400)',
+        amount: 4400,
+        screenshot: '',
+        notes: 'Respective POC will be reaching out to you on the same.'
+      },
+      {
+        id: Date.now()+4,
+        timestamp: new Date().toLocaleString(),
+        name: 'Anitha Rao',
+        tower: 'T5',
+        flat: '501',
+        gothram: 'Vasishta',
+        phone: '9765432109',
+        category: 'MahaPrasadam',
+        categoryLabel: CATEGORY_LABELS['MahaPrasadam'],
+        details: 'Cash Contribution',
+        amount: 6000,
+        screenshot: tinyImg,
+        notes: 'Happy to sponsor Maha Prasadam this year'
+      }
+    ];
+
+    const data = loadData();
+    samples.forEach(s=>data.push(s));
+    saveData(data);
+    renderAdminTable();
+    showToast('🧪 4 sample entries added to Admin data.');
+  }
+</script>
+
+</body>
+</html>
