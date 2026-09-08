@@ -200,6 +200,33 @@
     color:var(--maroon-dark);
     font-size:.88rem;
   }
+  .upi-pay-btn{
+    display:inline-block;
+    margin-top:14px;
+    background:linear-gradient(135deg,#1c5d34,#0d3b1f);
+    color:#fff;
+    text-decoration:none;
+    padding:12px 26px;
+    border-radius:30px;
+    font-weight:700;
+    font-size:.95rem;
+    box-shadow:0 3px 8px rgba(0,0,0,.25);
+    transition:.2s;
+    border:none;
+    cursor:pointer;
+  }
+  .upi-pay-btn:hover{opacity:.9;}
+  .upi-pay-btn:disabled{
+    background:#aaa;
+    cursor:not-allowed;
+    box-shadow:none;
+  }
+  .desktop-upi-hint{
+    font-size:.78rem;
+    color:#886;
+    margin-top:10px;
+    font-style:italic;
+  }
   button.submit-btn, button.action-btn{
     background:var(--green);
     color:#fff;
@@ -386,6 +413,20 @@
                  onerror="this.onerror=null;this.alt='QR image not found — place qr.png inside the assets folder next to this HTML file.';this.style.padding='20px';this.style.background='#eee';">
             <p>Scan & Contribute — Every Contribution, Every Blessing, Every Moment Together.</p>
             <p style="font-size:.8rem;color:#553;margin-top:4px;">UPI ID: 8884501914@icici (Pradeep Kumar Associates)</p>
+
+            <div id="upiPayWrap">
+              <button type="button" id="upiPayBtn" class="upi-pay-btn" onclick="payViaUpiApp()">📱 Pay via UPI App</button>
+              <p id="desktopUpiHint" class="desktop-upi-hint hidden">On a desktop/laptop, this button won't open a UPI app — please scan the QR above using your phone instead.</p>
+            </div>
+          </div>
+
+          <div id="groceryPhotoBlock" class="hidden">
+            <label>Grocery Item Photo (optional reference)</label>
+            <div id="groceryDropZone" class="drop-zone" onclick="document.getElementById('groceryPhoto').click();">
+              <span id="groceryDropZoneText">📎 Click to browse, or drag &amp; drop a photo of the item(s) here</span>
+            </div>
+            <input type="file" id="groceryPhoto" accept="image/*" onchange="previewGroceryPhoto()" style="display:none;">
+            <img id="groceryPhotoPreview" class="screenshot-preview" alt="Grocery item photo preview">
           </div>
         </div>
 
@@ -442,7 +483,7 @@
             <thead>
               <tr>
                 <th>#</th><th>Timestamp</th><th>Name</th><th>Tower</th><th>Flat</th><th>Gothram</th><th>Phone</th>
-                <th>Category</th><th>Details</th><th>Amount (₹)</th><th>Screenshot</th><th>Notes</th>
+                <th>Category</th><th>Details</th><th>Amount (₹)</th><th>Screenshot</th><th>Grocery Photo</th><th>Notes</th>
               </tr>
             </thead>
             <tbody id="adminTableBody"></tbody>
@@ -480,6 +521,39 @@
     MahaPrasadam: 'Maha Prasadam (Anna Danam)'
   };
 
+  const UPI_VPA = '8884501914@icici';
+  const UPI_PAYEE_NAME = 'Pradeep Kumar Associates';
+  const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    const hint = document.getElementById('desktopUpiHint');
+    const btn = document.getElementById('upiPayBtn');
+    if(!IS_MOBILE && hint && btn){
+      hint.classList.remove('hidden');
+    }
+  });
+
+  function payViaUpiApp(){
+    const amt = parseFloat(document.getElementById('amount').value)||0;
+    if(amt <= 0){
+      alert('Please enter a donation amount before proceeding to pay.');
+      return;
+    }
+    const cat = document.getElementById('category').value;
+    const donorName = document.getElementById('donorName').value.trim() || 'Donor';
+    const categoryLabel = CATEGORY_LABELS[cat] || 'Donation';
+    const note = `OnCloud33 Ganesh Utsav - ${categoryLabel} - ${donorName}`;
+
+    const upiUrl = `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${encodeURIComponent(amt)}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+    if(!IS_MOBILE){
+      alert('This works best on a mobile device with a UPI app installed (GPay, PhonePe, Paytm, BHIM, etc.). On desktop, please scan the QR code above instead.');
+      return;
+    }
+
+    window.location.href = upiUrl;
+  }
+
   function showTab(tab){
     document.getElementById('donateTab').classList.toggle('hidden', tab!=='donate');
     document.getElementById('adminTab').classList.toggle('hidden', tab!=='admin');
@@ -509,6 +583,7 @@
     } else {
       document.getElementById('amount').value = '';
       document.getElementById('amount').readOnly = false;
+      document.getElementById('groceryPhotoBlock').classList.add('hidden');
       onAmountChange();
     }
   }
@@ -524,6 +599,7 @@
     amountInput.value = total;
     amountInput.readOnly = true;
     document.getElementById('groceryNote').classList.toggle('hidden', !anySelected);
+    document.getElementById('groceryPhotoBlock').classList.toggle('hidden', !anySelected);
     onAmountChange();
   }
 
@@ -590,6 +666,52 @@
     });
   })();
 
+  function previewGroceryPhoto(){
+    const file = document.getElementById('groceryPhoto').files[0];
+    const preview = document.getElementById('groceryPhotoPreview');
+    const dropZoneText = document.getElementById('groceryDropZoneText');
+    if(file){
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+      if(dropZoneText) dropZoneText.textContent = '✅ Selected: ' + file.name + ' (click to change)';
+    } else {
+      preview.style.display = 'none';
+      if(dropZoneText) dropZoneText.textContent = '📎 Click to browse, or drag & drop a photo of the item(s) here';
+    }
+  }
+
+  (function setupGroceryDropZone(){
+    const dropZone = document.getElementById('groceryDropZone');
+    const fileInput = document.getElementById('groceryPhoto');
+    if(!dropZone || !fileInput) return;
+
+    ['dragenter','dragover'].forEach(evt=>{
+      dropZone.addEventListener(evt, e=>{
+        e.preventDefault(); e.stopPropagation();
+        dropZone.classList.add('dragover');
+      });
+    });
+    ['dragleave','drop'].forEach(evt=>{
+      dropZone.addEventListener(evt, e=>{
+        e.preventDefault(); e.stopPropagation();
+        dropZone.classList.remove('dragover');
+      });
+    });
+    dropZone.addEventListener('drop', e=>{
+      const files = e.dataTransfer.files;
+      if(files && files.length>0 && files[0].type.startsWith('image/')){
+        fileInput.files = files;
+        previewGroceryPhoto();
+      } else {
+        alert('Please drop a valid image file.');
+      }
+    });
+  })();
+
   function loadData(){
     try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch(e){ return []; }
@@ -603,6 +725,7 @@
     const cat = document.getElementById('category').value;
     const amt = parseFloat(document.getElementById('amount').value)||0;
     const screenshotFile = document.getElementById('paymentScreenshot').files[0];
+    const groceryPhotoFile = document.getElementById('groceryPhoto').files[0];
     const cashDonation = isCashDonation();
 
     if(amt > 0 && cashDonation && !screenshotFile){
@@ -629,7 +752,7 @@
       }
     }
 
-    function finalizeSubmit(screenshotDataUrl){
+    function finalizeSubmit(screenshotDataUrl, groceryPhotoDataUrl){
       const userNotes = document.getElementById('notes').value.trim();
       const combinedNotes = [userNotes, autoNote].filter(Boolean).join(' | ');
       const entry = {
@@ -645,6 +768,7 @@
         details: details,
         amount: amt,
         screenshot: screenshotDataUrl || '',
+        groceryPhoto: groceryPhotoDataUrl || '',
         notes: combinedNotes
       };
 
@@ -657,18 +781,24 @@
       document.getElementById('mahaPrasadamBlock').classList.add('hidden');
       document.getElementById('groceryBlock').classList.add('hidden');
       document.getElementById('groceryNote').classList.add('hidden');
+      document.getElementById('groceryPhotoBlock').classList.add('hidden');
       document.getElementById('amountQrBlock').classList.add('hidden');
       document.getElementById('amount').readOnly = false;
       document.getElementById('screenshotPreview').style.display = 'none';
+      document.getElementById('groceryPhotoPreview').style.display = 'none';
     }
 
-    if(screenshotFile){
-      const reader = new FileReader();
-      reader.onload = e => finalizeSubmit(e.target.result);
-      reader.readAsDataURL(screenshotFile);
-    } else {
-      finalizeSubmit(null);
+    function readFileAsDataUrl(file){
+      return new Promise(resolve=>{
+        if(!file){ resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
     }
+
+    Promise.all([readFileAsDataUrl(screenshotFile), readFileAsDataUrl(groceryPhotoFile)])
+      .then(([screenshotDataUrl, groceryPhotoDataUrl]) => finalizeSubmit(screenshotDataUrl, groceryPhotoDataUrl));
   });
 
   function showToast(msg){
@@ -731,6 +861,7 @@
         <td>${escapeHtml(d.details||'-')}</td>
         <td>${d.amount||0}</td>
         <td>${d.screenshot ? `<img src="${d.screenshot}" style="max-width:60px;max-height:60px;border-radius:4px;cursor:pointer" onclick="window.open('${d.screenshot}','_blank')">` : '-'}</td>
+        <td>${d.groceryPhoto ? `<img src="${d.groceryPhoto}" style="max-width:60px;max-height:60px;border-radius:4px;cursor:pointer" onclick="window.open('${d.groceryPhoto}','_blank')">` : '-'}</td>
         <td>${escapeHtml(d.notes||'-')}</td>`;
       tbody.appendChild(tr);
     });
@@ -744,8 +875,8 @@
   function exportCSV(){
     const data = loadData();
     if(data.length===0){ alert('No data to export.'); return; }
-    const headers = ['Timestamp','Name','Tower','Flat','Gothram','Phone','Category','Details','Amount','Screenshot Attached','Notes'];
-    const rows = data.map(d=>[d.timestamp,d.name,d.tower,d.flat,d.gothram,d.phone,d.categoryLabel,d.details,d.amount,(d.screenshot?'Yes':'No'),d.notes]);
+    const headers = ['Timestamp','Name','Tower','Flat','Gothram','Phone','Category','Details','Amount','Screenshot Attached','Grocery Photo Attached','Notes'];
+    const rows = data.map(d=>[d.timestamp,d.name,d.tower,d.flat,d.gothram,d.phone,d.categoryLabel,d.details,d.amount,(d.screenshot?'Yes':'No'),(d.groceryPhoto?'Yes':'No'),d.notes]);
     let csv = headers.join(',') + '\n' + rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
