@@ -416,6 +416,7 @@
 
             <div id="upiPayWrap">
               <button type="button" id="upiPayBtn" class="upi-pay-btn" onclick="payViaUpiApp()">📱 Pay via UPI App</button>
+              <p class="desktop-upi-hint" style="color:var(--maroon-dark);font-weight:600;">⚠️ After completing payment in your UPI app, please come back to this page and upload your payment screenshot below — this app cannot automatically confirm your payment.</p>
               <p id="desktopUpiHint" class="desktop-upi-hint hidden">On a desktop/laptop, this button won't open a UPI app — please scan the QR above using your phone instead.</p>
             </div>
           </div>
@@ -473,6 +474,12 @@
             <option value="MahaPrasadam">Maha Prasadam (Anna Danam)</option>
           </select>
           <input type="text" id="searchBox" placeholder="Search name / flat / phone" oninput="renderAdminTable()">
+          <select id="filterStatus" onchange="renderAdminTable()">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Verified">Verified</option>
+            <option value="Rejected">Rejected</option>
+          </select>
           <button class="action-btn" onclick="exportCSV()">⬇ Export CSV</button>
           <button class="action-btn" style="background:#5a4fcf" onclick="loadSampleData()">🧪 Load Sample Data</button>
           <button class="action-btn" style="background:#b00020" onclick="clearAllData()">🗑 Clear All Data</button>
@@ -483,7 +490,7 @@
             <thead>
               <tr>
                 <th>#</th><th>Timestamp</th><th>Name</th><th>Tower</th><th>Flat</th><th>Gothram</th><th>Phone</th>
-                <th>Category</th><th>Details</th><th>Amount (₹)</th><th>Screenshot</th><th>Grocery Photo</th><th>Notes</th>
+                <th>Category</th><th>Details</th><th>Amount (₹)</th><th>Screenshot</th><th>Grocery Photo</th><th>Notes</th><th>Verification Status</th>
               </tr>
             </thead>
             <tbody id="adminTableBody"></tbody>
@@ -822,10 +829,12 @@
   function renderAdminTable(){
     const data = loadData();
     const catFilter = document.getElementById('filterCategory').value;
+    const statusFilter = document.getElementById('filterStatus').value;
     const search = document.getElementById('searchBox').value.toLowerCase();
 
     const filtered = data.filter(d=>{
       if(catFilter && d.category !== catFilter) return false;
+      if(statusFilter && (d.verificationStatus||'Pending') !== statusFilter) return false;
       if(search){
         const hay = (d.name+' '+d.tower+' '+d.flat+' '+d.gothram+' '+d.phone).toLowerCase();
         if(!hay.includes(search)) return false;
@@ -835,11 +844,19 @@
 
     // stats
     const totalAmount = data.reduce((s,d)=>s+(d.amount||0),0);
+    const verifiedAmount = data.filter(d=>(d.verificationStatus||'Pending')==='Verified').reduce((s,d)=>s+(d.amount||0),0);
+    const pendingCount = data.filter(d=>(d.verificationStatus||'Pending')==='Pending').length;
+    const verifiedCount = data.filter(d=>(d.verificationStatus||'Pending')==='Verified').length;
+    const rejectedCount = data.filter(d=>(d.verificationStatus||'Pending')==='Rejected').length;
     const byCat = {};
     data.forEach(d=>{ byCat[d.categoryLabel] = (byCat[d.categoryLabel]||0)+1; });
     let statsHtml = `
       <div class="stat-box"><div class="num">${data.length}</div><div class="lbl">Total Submissions</div></div>
-      <div class="stat-box"><div class="num">₹${totalAmount.toLocaleString()}</div><div class="lbl">Total Cash Pledged</div></div>`;
+      <div class="stat-box"><div class="num">₹${totalAmount.toLocaleString()}</div><div class="lbl">Total Cash Pledged</div></div>
+      <div class="stat-box" style="background:#1c5d34;"><div class="num">₹${verifiedAmount.toLocaleString()}</div><div class="lbl">Verified Amount</div></div>
+      <div class="stat-box" style="background:#8a7000;"><div class="num">${pendingCount}</div><div class="lbl">Pending Verification</div></div>
+      <div class="stat-box" style="background:#1c5d34;"><div class="num">${verifiedCount}</div><div class="lbl">Verified</div></div>
+      <div class="stat-box" style="background:#b00020;"><div class="num">${rejectedCount}</div><div class="lbl">Rejected</div></div>`;
     Object.keys(byCat).forEach(k=>{
       statsHtml += `<div class="stat-box"><div class="num">${byCat[k]}</div><div class="lbl">${k}</div></div>`;
     });
@@ -848,6 +865,7 @@
     const tbody = document.getElementById('adminTableBody');
     tbody.innerHTML = '';
     filtered.slice().reverse().forEach((d,i)=>{
+      const status = d.verificationStatus || 'Pending';
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${filtered.length-i}</td>
@@ -862,9 +880,27 @@
         <td>${d.amount||0}</td>
         <td>${d.screenshot ? `<img src="${d.screenshot}" style="max-width:60px;max-height:60px;border-radius:4px;cursor:pointer" onclick="window.open('${d.screenshot}','_blank')">` : '-'}</td>
         <td>${d.groceryPhoto ? `<img src="${d.groceryPhoto}" style="max-width:60px;max-height:60px;border-radius:4px;cursor:pointer" onclick="window.open('${d.groceryPhoto}','_blank')">` : '-'}</td>
-        <td>${escapeHtml(d.notes||'-')}</td>`;
+        <td>${escapeHtml(d.notes||'-')}</td>
+        <td>
+          <select onchange="updateVerificationStatus(${d.id}, this.value)" style="padding:4px;border-radius:4px;font-size:.8rem;${status==='Verified'?'background:#d4f5da;':status==='Rejected'?'background:#f9d0d0;':'background:#fff3c4;'}">
+            <option value="Pending" ${status==='Pending'?'selected':''}>Pending</option>
+            <option value="Verified" ${status==='Verified'?'selected':''}>Verified</option>
+            <option value="Rejected" ${status==='Rejected'?'selected':''}>Rejected</option>
+          </select>
+        </td>`;
       tbody.appendChild(tr);
     });
+  }
+
+  function updateVerificationStatus(id, status){
+    const data = loadData();
+    const entry = data.find(d=>d.id===id);
+    if(entry){
+      entry.verificationStatus = status;
+      saveData(data);
+      renderAdminTable();
+      showToast('Status updated to "' + status + '" for ' + entry.name);
+    }
   }
 
   function escapeHtml(str){
@@ -875,8 +911,8 @@
   function exportCSV(){
     const data = loadData();
     if(data.length===0){ alert('No data to export.'); return; }
-    const headers = ['Timestamp','Name','Tower','Flat','Gothram','Phone','Category','Details','Amount','Screenshot Attached','Grocery Photo Attached','Notes'];
-    const rows = data.map(d=>[d.timestamp,d.name,d.tower,d.flat,d.gothram,d.phone,d.categoryLabel,d.details,d.amount,(d.screenshot?'Yes':'No'),(d.groceryPhoto?'Yes':'No'),d.notes]);
+    const headers = ['Timestamp','Name','Tower','Flat','Gothram','Phone','Category','Details','Amount','Screenshot Attached','Grocery Photo Attached','Notes','Verification Status'];
+    const rows = data.map(d=>[d.timestamp,d.name,d.tower,d.flat,d.gothram,d.phone,d.categoryLabel,d.details,d.amount,(d.screenshot?'Yes':'No'),(d.groceryPhoto?'Yes':'No'),d.notes,(d.verificationStatus||'Pending')]);
     let csv = headers.join(',') + '\n' + rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob = new Blob([csv], {type:'text/csv'});
     const url = URL.createObjectURL(blob);
@@ -913,7 +949,8 @@
         details: '',
         amount: 2000,
         screenshot: tinyImg,
-        notes: 'Will drop off vastralu on 13th evening'
+        notes: 'Will drop off vastralu on 13th evening',
+        verificationStatus: 'Verified'
       },
       {
         id: Date.now()+2,
@@ -928,7 +965,8 @@
         details: '',
         amount: 1500,
         screenshot: tinyImg,
-        notes: ''
+        notes: '',
+        verificationStatus: 'Pending'
       },
       {
         id: Date.now()+3,
@@ -943,7 +981,8 @@
         details: 'Grocery — Rice Bag (26 Kg): 2, Oil Packets: 5 (Total ₹4400)',
         amount: 4400,
         screenshot: '',
-        notes: 'Respective POC will be reaching out to you on the same.'
+        notes: 'Respective POC will be reaching out to you on the same.',
+        verificationStatus: 'Pending'
       },
       {
         id: Date.now()+4,
@@ -958,7 +997,8 @@
         details: 'Cash Contribution',
         amount: 6000,
         screenshot: tinyImg,
-        notes: 'Happy to sponsor Maha Prasadam this year'
+        notes: 'Happy to sponsor Maha Prasadam this year',
+        verificationStatus: 'Rejected'
       }
     ];
 
